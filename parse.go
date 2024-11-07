@@ -1,4 +1,4 @@
-package main
+package obsidian
 
 import (
 	"bytes"
@@ -38,7 +38,7 @@ func parse(dir, pathPrefix string) []Link {
 		source := processSource(trim(dir, pathPrefix, ".md"))
 
 		// fmt.Printf("  '%s' => %s\n", source, target)
-		if !strings.HasPrefix(text, "^"){
+		if !strings.HasPrefix(text, "^") {
 			links = append(links, Link{
 				Source: source,
 				Target: target,

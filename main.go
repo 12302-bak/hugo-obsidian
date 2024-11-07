@@ -1,4 +1,4 @@
-package main
+package obsidian
 
 import (
 	"flag"
@@ -66,7 +66,7 @@ func getIgnoredFiles(base string) (res map[string]struct{}) {
 	return res
 }
 
-func main() {
+func main1() {
 	in := flag.String("input", ".", "Input Directory")
 	out := flag.String("output", ".", "Output Directory")
 	root := flag.String("root", "..", "Root Directory (for config parsing)")
@@ -80,4 +80,12 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func BuildData(root string, content string, out string) error {
+	ignoreBlobs := getIgnoredFiles(root)
+	l, i := walk(content, ".md", true, ignoreBlobs)
+	f := filter(l)
+	err := write(f, i, true, out, root)
+	return err
 }
