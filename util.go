@@ -13,7 +13,7 @@ func trim(source, prefix, suffix string) string {
 }
 
 func hugoPathTrim(source string) string {
-	return strings.TrimSuffix(strings.TrimSuffix(source, "/index"), "_index")
+	return strings.TrimSuffix(strings.TrimSuffix(source, "/index"), "README")
 }
 
 func processTarget(source string) string {
