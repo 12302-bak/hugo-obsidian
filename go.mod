@@ -1,4 +1,4 @@
-module github.com/jackyzha0/hugo-obsidian/v3
+module github.com/12302-bak/hugo-obsidian/v3
 
 go 1.16
 
