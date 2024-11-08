@@ -18,7 +18,7 @@ func parse(dir, pathPrefix string) []Link {
 
 	// parse md
 	var links []Link
-	fmt.Printf("[Parsing note] %s => ", trim(dir, pathPrefix, ".md"))
+	//fmt.Printf("[Parsing note] %s => ", trim(dir, pathPrefix, ".md"))
 
 	var buf bytes.Buffer
 	if err := md.Convert(source, &buf); err != nil {
