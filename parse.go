@@ -2,7 +2,6 @@ package obsidian
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"io/ioutil"
 	"strings"
@@ -47,7 +46,7 @@ func parse(dir, pathPrefix string) []Link {
 			n++
 		}
 	})
-	fmt.Printf("found: %d links\n", n)
+	//fmt.Printf("found: %d links\n", n)
 
 	return links
 }
