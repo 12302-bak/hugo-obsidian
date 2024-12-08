@@ -6,9 +6,10 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"strings"
 )
 
-func write(links []Link, contentIndex ContentIndex, toIndex bool, out string, root string) error {
+func write(links []Link, contentIndex ContentIndex, toIndex bool, out string, root string, baseUrl string) error {
 	index := index(links)
 	resStruct := struct {
 		Index Index  `json:"index"`
@@ -44,6 +45,12 @@ func write(links []Link, contentIndex ContentIndex, toIndex bool, out string, ro
 		if writeErr != nil {
 			return writeErr
 		}
+
+		// write links.txt
+		writeErr = writeLinks(&contentIndex, baseUrl, root)
+		if writeErr != nil {
+			return writeErr
+		}
 	}
 
 	return nil
@@ -63,6 +70,27 @@ func writeLinkMap(contentIndex *ContentIndex, root string) error {
 		} else {
 			_, _ = datawriter.WriteString(path + "/index.{html} " + path + "/\n")
 		}
+	}
+	datawriter.Flush()
+	file.Close()
+
+	return nil
+}
+
+func writeLinks(contentIndex *ContentIndex, baseUrl string, root string) error {
+	fp := path.Join(root, "static", "links.txt")
+	file, err := os.OpenFile(fp, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return err
+	}
+
+	if strings.HasSuffix(baseUrl, "/") {
+		baseUrl = baseUrl[0 : len(baseUrl)-1]
+	}
+
+	datawriter := bufio.NewWriter(file)
+	for path := range *contentIndex {
+		datawriter.WriteString(baseUrl + path + "\n")
 	}
 	datawriter.Flush()
 	file.Close()

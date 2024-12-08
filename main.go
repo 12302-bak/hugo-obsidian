@@ -2,10 +2,11 @@ package obsidian
 
 import (
 	"flag"
-	"github.com/BurntSushi/toml"
 	wikilink "github.com/abhinav/goldmark-wikilink"
 	"github.com/yuin/goldmark"
+	"gopkg.in/yaml.v2"
 	"io/ioutil"
+	"log"
 	"path/filepath"
 	"time"
 )
@@ -43,27 +44,57 @@ type ConfigTOML struct {
 	IgnoredFiles []string `toml:"ignoreFiles"`
 }
 
+type ConfigYaml struct {
+	IgnoreFiles []string `yaml:"ignoreFiles"`
+	BaseURL     string   `yaml:"baseURL"`
+}
+
 func getIgnoredFiles(base string) (res map[string]struct{}) {
 	res = make(map[string]struct{})
 
-	source, err := ioutil.ReadFile(filepath.FromSlash(base + "/config.toml"))
+	source, err := ioutil.ReadFile(filepath.FromSlash(base + "/config.yaml"))
 	if err != nil {
 		return res
 	}
 
-	var config ConfigTOML
-	if _, err := toml.Decode(string(source), &config); err != nil {
-		return res
+	//var config ConfigTOML
+	//if _, err := toml.Decode(string(source), &config); err != nil {
+	//	return res
+	//}
+	var config ConfigYaml
+	err = yaml.Unmarshal(source, &config)
+	if err != nil {
+		log.Fatalf("Error unmarshalling YAML: %v", err)
 	}
 
-	for _, glb := range config.IgnoredFiles {
-		matches, _ := filepath.Glob(base + glb)
+	for _, glb := range config.IgnoreFiles {
+		matches, _ := filepath.Glob(glb)
 		for _, match := range matches {
 			res[match] = struct{}{}
 		}
 	}
 
 	return res
+}
+
+func getBaseUrl(base string) string {
+	res := "no prefix"
+	source, err := ioutil.ReadFile(filepath.FromSlash(base + "/config.yaml"))
+	if err != nil {
+		return res
+	}
+
+	//var config ConfigTOML
+	//if _, err := toml.Decode(string(source), &config); err != nil {
+	//	return res
+	//}
+	var config ConfigYaml
+	err = yaml.Unmarshal(source, &config)
+	if err != nil {
+		log.Fatalf("Error unmarshalling YAML: %v", err)
+	}
+
+	return config.BaseURL
 }
 
 func main1() {
@@ -76,16 +107,16 @@ func main1() {
 	ignoreBlobs := getIgnoredFiles(*root)
 	l, i := walk(*in, ".md", *index, ignoreBlobs)
 	f := filter(l)
-	err := write(f, i, *index, *out, *root)
+	err := write(f, i, *index, *out, *root, "")
 	if err != nil {
 		panic(err)
 	}
 }
 
-func BuildData(root string, content string, out string) error {
+func BuildData(baseUrl string, root string, content string, out string) error {
 	ignoreBlobs := getIgnoredFiles(root)
 	l, i := walk(content, ".md", true, ignoreBlobs)
 	f := filter(l)
-	err := write(f, i, true, out, root)
+	err := write(f, i, true, out, root, baseUrl)
 	return err
 }
