@@ -67,6 +67,10 @@ func walk(root, ext string, index bool, ignorePaths map[string]struct{}) (res []
 					if title == "" {
 						fileName := d.Name()
 						title = strings.TrimSuffix(filepath.Base(fileName), filepath.Ext(fileName))
+						if title == "README" {
+							title = filepath.Base(filepath.Dir(s))
+						}
+						title = strings.ToUpper(title)
 					}
 
 					// default tags
